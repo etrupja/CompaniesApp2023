@@ -1,4 +1,5 @@
 ﻿using CompaniesApp.API.Data;
+using CompaniesApp.API.Data.DTOs;
 using CompaniesApp.API.Data.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,11 +32,21 @@ namespace CompaniesApp.API.Controllers
             return Ok(companyDb);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         public IActionResult DeleteCompanyById(int id)
         {
             var companyDb = new Company();
+
             return Ok("Company was deleted");
+        }
+
+        [HttpPost]
+        public IActionResult PostCompany([FromBody]PostCompanyDto payload)
+        {
+            //Shtohet kompania ne database
+            var companyName = payload.Name;
+
+            return Ok("Company was added");
         }
     }
 }
