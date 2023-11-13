@@ -76,5 +76,47 @@ namespace CompaniesApp.API.Data
         {
             return CompaniesDb;
         }
+
+
+        public static List<Employee> EmployeesDb = new List<Employee>()
+        {
+            new Employee()
+            {
+                Id = 1,
+                FirstName = "Employee 01",
+                LastName = "LN01",
+                DOB = DateTime.UtcNow,
+                Role = "Admin"
+            },
+            new Employee()
+            {
+                Id = 2,
+                FirstName = "Employee 02",
+                LastName = "LN02",
+                DOB = DateTime.UtcNow,
+                Role = "Admin"
+            },
+            new Employee()
+            {
+                Id = 3,
+                FirstName = "Employee 03",
+                LastName = "LN03",
+                DOB = DateTime.UtcNow,
+                Role = "Admin"
+            },
+            new Employee()
+            {
+                Id = 4,
+                FirstName = "Employee 04",
+                LastName = "LN04",
+                DOB = DateTime.UtcNow,
+                Role = "Admin"
+            }
+        };
+
+        public static List<Employee> GetAllEmployees()
+        {
+            return EmployeesDb;
+        }
     }
 }
