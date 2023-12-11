@@ -6,5 +6,7 @@ namespace CompaniesApp.API.Data.Models
     {
         public string Name { get; set; }
         public int EstablishedYear { get; set; }
+
+        public string Address { get; set; }
     }
 }
