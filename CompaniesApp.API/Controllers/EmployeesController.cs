@@ -1,7 +1,6 @@
 ﻿using CompaniesApp.API.Data;
 using CompaniesApp.API.Data.DTOs;
 using CompaniesApp.API.Data.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CompaniesApp.API.Controllers
@@ -10,19 +9,24 @@ namespace CompaniesApp.API.Controllers
     [ApiController]
     public class EmployeesController : ControllerBase
     {
+        private AppDbContext _dbContext;
+        public EmployeesController(AppDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         //Marrim te gjithe punonjesit nga databaza
         [HttpGet]
         public IActionResult GetAllEmployees()
         {
-            var allEmployeesFromDb = FakeDb.EmployeesDb.ToList();
+            var allEmployeesFromDb = _dbContext.Employees.ToList();
             return Ok(allEmployeesFromDb);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetEmployeeById(int id)
         {
-            var employeeFromDb = FakeDb.EmployeesDb.FirstOrDefault(x => x.Id == id);
-
+            var employeeFromDb = _dbContext.Employees.FirstOrDefault(x => x.Id == id);
             if (employeeFromDb == null)
             {
                 return NotFound($"Employee with id = {id} not found");
@@ -35,16 +39,16 @@ namespace CompaniesApp.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteEmployeeById(int id)
         {
-            var employeeFromDb = FakeDb.EmployeesDb.FirstOrDefault(x => x.Id == id);
+            var employeeFromDb = _dbContext.Employees.FirstOrDefault(x => x.Id == id);
 
             if(employeeFromDb == null)
             {
                 return NotFound($"Employee with id = {id} not found");
             } else
             {
-                FakeDb.EmployeesDb.Remove(employeeFromDb);
+                _dbContext.Employees.Remove(employeeFromDb);
+                _dbContext.SaveChanges();
 
-                var latestList = FakeDb.EmployeesDb.ToList();
                 return Ok($"Employee with id = {id} was removed");
             }
         }
@@ -55,17 +59,16 @@ namespace CompaniesApp.API.Controllers
             //1. Krijohet objekti
             var newEmployee = new Employee()
             {
-                //Generate Id for new employee 10-99
-                Id = new Random().Next(10, 100),
-
                 FirstName = payload.FirstName,
                 LastName = payload.LastName,
                 DOB = payload.DOB,
-                Role = payload.Role
+                Role = payload.Role,
+                Email = payload.Email
             };
 
             //2. Shtohet objekti ne DB
-            FakeDb.EmployeesDb.Add(newEmployee);
+            _dbContext.Employees.Add(newEmployee);
+            _dbContext.SaveChanges();
 
             return Ok("PostEmployee");
         }
@@ -74,7 +77,7 @@ namespace CompaniesApp.API.Controllers
         public IActionResult UpdateEmployee([FromBody] PutEmployeeDto newData, int id)
         {
             //1. Merr te dhenat e vjetra nga db
-            var employeeFromDb = FakeDb.EmployeesDb.FirstOrDefault(x => x.Id == id);
+            var employeeFromDb = _dbContext.Employees.FirstOrDefault(x => x.Id == id);
 
             if(employeeFromDb == null)
             {
@@ -88,7 +91,8 @@ namespace CompaniesApp.API.Controllers
             employeeFromDb.Role = newData.Role;
 
             //3. Ruaj te ne database
-
+            _dbContext.Update(employeeFromDb);
+            _dbContext.SaveChanges();
 
             return Ok("Employee updated");
         }

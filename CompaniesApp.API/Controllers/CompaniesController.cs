@@ -1,7 +1,6 @@
 ﻿using CompaniesApp.API.Data;
 using CompaniesApp.API.Data.DTOs;
 using CompaniesApp.API.Data.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CompaniesApp.API.Controllers
@@ -67,7 +66,7 @@ namespace CompaniesApp.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateCompanyById(int id, [FromBody]UpdateCompanyDto payload)
+        public IActionResult UpdateCompanyById(int id, [FromBody]PutCompanyDto payload)
         {
             var companyDb = FakeDb.CompaniesDb.FirstOrDefault(x => x.Id == id);
 
