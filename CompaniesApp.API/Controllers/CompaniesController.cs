@@ -9,20 +9,24 @@ namespace CompaniesApp.API.Controllers
     [ApiController]
     public class CompaniesController : ControllerBase
     {
-        //Marrim te gjitha kompanite nga databaza
+        private AppDbContext _dbContext;
+        public CompaniesController(AppDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         [HttpGet]
         public IActionResult GetAllCompanies()
         {
-            var companiesDb = FakeDb.CompaniesDb.ToList();
-
+            var companiesDb = _dbContext.Companies.ToList();
             return Ok(companiesDb);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetCompanyById(int id)
         {
-            var companyDb = FakeDb.CompaniesDb.FirstOrDefault(x => x.Id == id);
-
+            var companyDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
+            
             if(companyDb == null)
             {
                 return NotFound($"Company with id = {id} not found");
@@ -35,13 +39,16 @@ namespace CompaniesApp.API.Controllers
         [HttpDelete("Delete/{id}")]
         public IActionResult DeleteCompanyById(int id)
         {
-            var companyDb = FakeDb.CompaniesDb.FirstOrDefault(x => x.Id == id);
+            var companyDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
+
             if(companyDb == null)
             {
                 return NotFound($"Company with id = {id} not found");
             } else
             {
-                FakeDb.CompaniesDb.Remove(companyDb);
+                _dbContext.Companies.Remove(companyDb);
+                _dbContext.SaveChanges();
+
                 return Ok($"Company with id = {id} was removed");
             }
         }
@@ -52,14 +59,13 @@ namespace CompaniesApp.API.Controllers
             //1. Krijohet objekti
             var newEmployee = new Company()
             {
-                //Generate Id for new employee 10-99
-                Id = new Random().Next(10, 100),
                 Name = payload.Name,
-                EstablishedYear = payload.EstablishedYear,
+                EstablishedYear = payload.EstablishedYear
             };
 
             //2. Shtohet objekti ne DB
-            FakeDb.CompaniesDb.Add(newEmployee);
+            _dbContext.Companies.Add(newEmployee);
+            _dbContext.SaveChanges();
 
             //3. Kthehet pergjigja
             return Ok("New employee created");
@@ -68,7 +74,7 @@ namespace CompaniesApp.API.Controllers
         [HttpPut("{id}")]
         public IActionResult UpdateCompanyById(int id, [FromBody]PutCompanyDto payload)
         {
-            var companyDb = FakeDb.CompaniesDb.FirstOrDefault(x => x.Id == id);
+            var companyDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
 
             if(companyDb == null)
             {
@@ -77,6 +83,9 @@ namespace CompaniesApp.API.Controllers
             {
                 companyDb.Name = payload.Name;
                 companyDb.EstablishedYear = payload.EstablishedYear;
+
+                _dbContext.Companies.Update(companyDb);
+                _dbContext.SaveChanges();
 
                 return Ok($"Company with id = {id} was updated");
             }
