@@ -1,4 +1,5 @@
 using CompaniesApp.API.Data;
+using CompaniesApp.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
     options.UseSqlServer("Data Source=ETR\\SQLEXPRESS;Initial Catalog=CompaniesAppDB;Integrated Security=True;Encrypt=False");
 });
+
+//Configure Services
+builder.Services.AddScoped<ICompaniesService, CompaniesService>();
+//builder.Services.AddScoped<ICompaniesService, CompaniesMySqlService>();
 
 var app = builder.Build();
 

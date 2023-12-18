@@ -1,6 +1,7 @@
 ﻿using CompaniesApp.API.Data;
 using CompaniesApp.API.Data.DTOs;
 using CompaniesApp.API.Data.Models;
+using CompaniesApp.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CompaniesApp.API.Controllers
@@ -9,23 +10,23 @@ namespace CompaniesApp.API.Controllers
     [ApiController]
     public class CompaniesController : ControllerBase
     {
-        private AppDbContext _dbContext;
-        public CompaniesController(AppDbContext dbContext)
+        private ICompaniesService _companiesService;
+        public CompaniesController(ICompaniesService companiesService)
         {
-            _dbContext = dbContext;
+            _companiesService = companiesService;
         }
 
         [HttpGet]
         public IActionResult GetAllCompanies()
         {
-            var companiesDb = _dbContext.Companies.ToList();
+            var companiesDb = _companiesService.GetCompanies();
             return Ok(companiesDb);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetCompanyById(int id)
         {
-            var companyDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
+            var companyDb = _companiesService.GetCompanyById(id);
             
             if(companyDb == null)
             {
@@ -39,56 +40,25 @@ namespace CompaniesApp.API.Controllers
         [HttpDelete("Delete/{id}")]
         public IActionResult DeleteCompanyById(int id)
         {
-            var companyDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
+            _companiesService.DeleteCompanyById(id);
 
-            if(companyDb == null)
-            {
-                return NotFound($"Company with id = {id} not found");
-            } else
-            {
-                _dbContext.Companies.Remove(companyDb);
-                _dbContext.SaveChanges();
-
-                return Ok($"Company with id = {id} was removed");
-            }
+            return Ok("Deleted");
         }
 
         [HttpPost]
         public IActionResult PostCompany([FromBody]PostCompanyDto payload)
         {
-            //1. Krijohet objekti
-            var newEmployee = new Company()
-            {
-                Name = payload.Name,
-                EstablishedYear = payload.EstablishedYear
-            };
+            _companiesService.PostCompany(payload);
 
-            //2. Shtohet objekti ne DB
-            _dbContext.Companies.Add(newEmployee);
-            _dbContext.SaveChanges();
-
-            //3. Kthehet pergjigja
             return Ok("New employee created");
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateCompanyById(int id, [FromBody]PutCompanyDto payload)
         {
-            var companyDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
+            _companiesService.UpdateCompany(id, payload);
 
-            if(companyDb == null)
-            {
-                return NotFound($"Company with id = {id} not found");
-            } else
-            {
-                companyDb.Name = payload.Name;
-                companyDb.EstablishedYear = payload.EstablishedYear;
-
-                _dbContext.Companies.Update(companyDb);
-                _dbContext.SaveChanges();
-
-                return Ok($"Company with id = {id} was updated");
-            }
+            return Ok("Updated");
         }
     }
 }
