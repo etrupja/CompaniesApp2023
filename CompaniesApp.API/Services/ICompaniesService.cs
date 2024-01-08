@@ -5,11 +5,10 @@ namespace CompaniesApp.API.Services
 {
     public interface ICompaniesService
     {
-        List<Company> GetCompanies();
-        Company GetCompanyById(int id);
-        void PostCompany(PostCompanyDto company);
-        Company UpdateCompany(int id, PutCompanyDto company);
-        void DeleteCompanyById(int id);
-
+        Task<List<Company>> GetCompaniesAsync();
+        Task<Company> GetCompanyByIdAsync(int id);
+        Task PostCompanyAsync(PostCompanyDto company);
+        Task<Company> UpdateCompanyAsync(int id, PutCompanyDto company);
+        Task DeleteCompanyByIdAsync(int id);
     }
 }

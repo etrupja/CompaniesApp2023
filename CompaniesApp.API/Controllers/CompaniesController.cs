@@ -9,7 +9,7 @@ namespace CompaniesApp.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class CompaniesController : ControllerBase
-    {
+    { 
         private ICompaniesService _companiesService;
         public CompaniesController(ICompaniesService companiesService)
         {

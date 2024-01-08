@@ -1,6 +1,7 @@
 ﻿using CompaniesApp.API.Data;
 using CompaniesApp.API.Data.DTOs;
 using CompaniesApp.API.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CompaniesApp.API.Services
 {
@@ -12,30 +13,19 @@ namespace CompaniesApp.API.Services
             _dbContext = dbContext;
         }
 
-        public void DeleteCompanyById(int id)
+        public async Task<List<Company>> GetCompaniesAsync()
         {
-            var companyFromDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
-
-            if(companyFromDb != null)
-            {
-                _dbContext.Companies.Remove(companyFromDb);
-                _dbContext.SaveChanges();
-            }
-        }
-
-        public List<Company> GetCompanies()
-        {
-            var allCompanies = _dbContext.Companies.ToList();
+            var allCompanies = await _dbContext.Companies.ToListAsync();
             return allCompanies;
         }
 
-        public Company GetCompanyById(int id)
+        public async Task<Company> GetCompanyByIdAsync(int id)
         {
-            var companyFromDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
+            var companyFromDb = await _dbContext.Companies.FirstOrDefaultAsync(x => x.Id == id);
             return companyFromDb;
         }
 
-        public void PostCompany(PostCompanyDto company)
+        public async Task PostCompanyAsync(PostCompanyDto company)
         {
             //1. Krijohet objekti
             var newCompany = new Company()
@@ -44,23 +34,34 @@ namespace CompaniesApp.API.Services
                 EstablishedYear = company.EstablishedYear
             };
 
-            _dbContext.Companies.Add(newCompany);
-            _dbContext.SaveChanges();
+            await _dbContext.Companies.AddAsync(newCompany);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Company UpdateCompany(int id, PutCompanyDto company)
+        public async Task<Company> UpdateCompanyAsync(int id, PutCompanyDto company)
         {
-            var companyFromDb = _dbContext.Companies.FirstOrDefault(x => x.Id == id);
+            var companyFromDb = await _dbContext.Companies.FirstOrDefaultAsync(x => x.Id == id);
 
             if(companyFromDb != null)
             {
                 companyFromDb.Name = company.Name;
                 companyFromDb.EstablishedYear = company.EstablishedYear;
 
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
 
             return companyFromDb;
+        }
+
+        public async Task DeleteCompanyByIdAsync(int id)
+        {
+            var companyFromDb = await _dbContext.Companies.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (companyFromDb != null)
+            {
+                _dbContext.Companies.Remove(companyFromDb);
+                await _dbContext.SaveChangesAsync();
+            }
         }
     }
 }
